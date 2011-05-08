@@ -7,7 +7,6 @@ import datetime
 import os.path
 import glob
 
-
 # Create your models here.
 class DescargadorFichero(object):    
     
@@ -135,8 +134,9 @@ class PrevisionGeolocalizada(models.Model):
     
     def __unicode__(self):
         return "lon = %(lon); lat = %(lat); temp = %(temp); prec = %(prec); fecha = %(fecha)" % \
-            {"lon":self.longitud, "lat":self.latitud, "temp":self.temperatura, "prec":self.precipitacion, "fecha":self.fecha_prevision}    #http://open.mapquestapi.com/nominatim/v1/search?q=Palazuelos+de+Eresma&format=json&limit=1
-
+            {"lon":self.longitud, "lat":self.latitud, "temp":self.temperatura, "prec":self.precipitacion, "fecha":self.fecha_prevision}
+    
+    
     
         
     
