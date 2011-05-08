@@ -7,7 +7,7 @@ Replace this with more appropriate tests for your application.
 
 from django.utils import unittest
 from ftplib import FTP
-from quemepongo.cargadatos.models import ManejadorFichero, DescargadorFichero, GestorPrevisiones, PrevisionGeolocalizada, Localidad
+from quemepongo.cargadatos.models import ManejadorFichero, DescargadorFichero, GestorPrevisiones, PrevisionGeolocalizada
 import os.path
 import os
 import glob
@@ -190,29 +190,43 @@ class PruebasRegistroPrevisiones(unittest.TestCase):
         
         self.assertTrue(PrevisionGeolocalizada.objects.count() > 0)
         
-class TestLocalidades(unittest.TestCase):
-    def setUp(self):
-        Localidad.objects.create(nombre="Segovia", latitud=10, longitud=20)
-        TestLocalidades
-        self.localidad = Localidad()
+    def test_obtener_prevision_cercana_existente(self):
         
-    def test_buscarLocalidad(self):    
-        resultado = self.localidad.buscar("Segovia")
-        self.assertEquals(len(resultado),1)
-        self.assertEqual(resultado[0].nombre, "Segovia")
-    
-    def test_buscarLocalidadInexistente(self):
-        resultado = self.localidad.buscar("Whasinton")
-        self.assertEquals(len(resultado),0) 
+        time_stamp = datetime.datetime(2011, 5, 7, 18, 0, 0)
+        lon = 40.3
+        lat = -3.67
+        temp = 350
+        prec = 5
         
-    def test_obtenerCoordenadasRegistradas(self):
-        resultado = self.localidad.obtener_coordenadas("Segovia");
-        self.assertAlmostEqual(resultado['latitud'], 10)
-        self.assertAlmostEqual(resultado['longitud'], 20)
+        p = PrevisionGeolocalizada(longitud = lon, latitud = lat, fecha_prevision = time_stamp, temperatura = temp, precipitacion = prec)
+        p.save()
+        
+        g = GestorPrevisiones()
+        p2 = g.obtener_prevision(lon - 0.007, lat - 0.007, time_stamp)
+        self.assertEqual(p, p2)
+
     
-    def test_obtenerCoordenadasInternet(self):
-        resultado = self.localidad.obtener_coordenadas_web("Palazuelos de Eresma")
-        self.assertAlmostEqual(resultado['latitud'], 40.924187714)
-        self.assertAlmostEqual(resultado['longitud'], -4.013027219766)
+    def test_existe_prevision_cercana(self):
+
+        time_stamp = datetime.datetime(2011, 5, 7, 18, 0, 0)
+        lon = 40.3
+        lat = -3.67
+        temp = 350
+        prec = 5
+        
+        p = PrevisionGeolocalizada(longitud = lon, latitud = lat, fecha_prevision = time_stamp, temperatura = temp, precipitacion = prec)
+        p.save()
+        
+        g = GestorPrevisiones()
+        self.assertTrue(g.existe_prevision(lon - 0.007, lat - 0.007, time_stamp))
+       
+    def test_no_existe_prevision_cercana(self):
+
+        time_stamp = datetime.datetime(2011, 5, 7, 18, 0, 0)
+        lon = 40.3
+        lat = -3.67
+      
+        g = GestorPrevisiones()
+        self.assertFalse(g.existe_prevision(lon - 0.007, lat - 0.007, time_stamp))  
             
         

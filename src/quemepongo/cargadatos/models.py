@@ -2,11 +2,7 @@ from django.db import models
 
 from ftplib import FTP
 import pygrib
-import urllib
 import tempfile
-import urllib2
-import json
-import unicodedata
 import datetime
 import os.path
 import glob
@@ -79,13 +75,21 @@ class GestorPrevisiones(object):
         prevision.save()
         
     def existe_prevision(self, lon, lat, fecha_prev):
+        lon_inicio = lon - 0.8
+        lon_final = lon + 0.8
+        lat_inicio = lat - 0.8
+        lat_final = lat + 0.8
         
-        return (len(PrevisionGeolocalizada.objects.filter(longitud = lon, latitud = lat, fecha_prevision = fecha_prev)) > 0)
+        return (len(PrevisionGeolocalizada.objects.filter(longitud__range = (lon_inicio, lon_final), latitud__range = (lat_inicio, lat_final), fecha_prevision = fecha_prev)) > 0)
         
     def obtener_prevision(self, lon, lat, fecha_prev):        
         
         if(self.existe_prevision(lon, lat, fecha_prev)):
-            prevision = PrevisionGeolocalizada.objects.get(longitud = lon, latitud = lat, fecha_prevision = fecha_prev)         
+            lon_inicio = lon - 0.8
+            lon_final = lon + 0.8
+            lat_inicio = lat - 0.8
+            lat_final = lat + 0.8
+            prevision = PrevisionGeolocalizada.objects.get(longitud__range = (lon_inicio, lon_final), latitud__range = (lat_inicio, lat_final), fecha_prevision = fecha_prev)         
         else:
             prevision = None
             
@@ -131,35 +135,8 @@ class PrevisionGeolocalizada(models.Model):
     
     def __unicode__(self):
         return "lon = %(lon); lat = %(lat); temp = %(temp); prec = %(prec); fecha = %(fecha)" % \
-            {"lon":self.longitud, "lat":self.latitud, "temp":self.temperatura, "prec":self.precipitacion, "fecha":self.fecha_prevision}
-    
-class Localidad(models.Model):
-    nombre = models.CharField(max_length=100)
-    latitud = models.FloatField(null=True)
-    longitud = models.FloatField(null=True)
-    def buscar(self, nombre):
-        return Localidad.objects.filter(nombre=nombre)
-    def obtener_coordenadas(self,nombre):
-        registros = self.buscar(nombre)
-        return {'latitud': registros[0].latitud,
-                'longitud': registros[0].longitud}
-        
-    def obtener_coordenadas_web(self, nombre):
-        nombre_formateado = nombre.replace(' ', '+')
-        url_original = "http://open.mapquestapi.com/nominatim/v1/search?q=" + nombre_formateado + "&format=json&limit=1"
-        url = urllib.quote(url_original, safe="%/:=&?~#+!$,;'@()*[]")
-        respuesta = urllib2.urlopen(url)
-        contenido = respuesta.read()
-        datos = json.loads(contenido)
-        latitud = float(datos[0]['lat'])
-        longitud = float(datos[0]['lon'])
-        return {'latitud': latitud,
-                'longitud': longitud}
-        #http://open.mapquestapi.com/nominatim/v1/search?q=Palazuelos+de+Eresma&format=json&limit=1
+            {"lon":self.longitud, "lat":self.latitud, "temp":self.temperatura, "prec":self.precipitacion, "fecha":self.fecha_prevision}    #http://open.mapquestapi.com/nominatim/v1/search?q=Palazuelos+de+Eresma&format=json&limit=1
 
-if __name__ == '__main__':
-    localidad = Localidad()
-    hola = localidad.obtener_coordenadas_web('Palazuelos de Eresma')
     
         
     
