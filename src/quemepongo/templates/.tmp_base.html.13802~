@@ -1,0 +1,5 @@
+<h1>QueMePongohoy.info</h1>
+
+{% block cuerpo %}{% endblock %}
+
+<p>Basado en la datos ofrecidos por <a href="http://www.aemet.es">AEMET</a></p>

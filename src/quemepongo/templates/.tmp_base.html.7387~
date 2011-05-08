@@ -1,0 +1,13 @@
+<h1>QueMePongohoy.info</h1>
+<p>Te recomendamos que te pongas <b>{{vestido}}</b></p>
+<table width="600" border="0" cellpadding="10">
+    <tr>
+        <td>
+        	<img src="/images/{{mujer}}" alt="{{vestido}}" />
+        </td>
+        <td>
+        	<img src="/images/{{hombre}}" alt="{{vestido}}" />
+        </td>
+    </tr>
+</table>
+<p>Basado en la datos ofrecidos por <a href="http://www.aemet.es">AEMET</a></p>
