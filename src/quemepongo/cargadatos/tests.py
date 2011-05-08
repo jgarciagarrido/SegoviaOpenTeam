@@ -8,7 +8,7 @@ Replace this with more appropriate tests for your application.
 from django.utils import unittest
 from ftplib import FTP
 from models import DescargadorFichero
-from quemepongo.cargadatos.models import ManejadorFichero
+from quemepongo.cargadatos.models import ManejadorFichero, Localidad
 import os.path
 import os
 import glob
@@ -78,10 +78,35 @@ class PruebaLecturaArchivo(unittest.TestCase):
         temperatura_posicion = self.Archivo.leer_temperatura( 0, 0)
         self.assertIsNotNone(temperatura_posicion['temperatura'])
         self.assertAlmostEqual(temperatura_posicion['temperatura'], 300.626235962)
-    
+    ''' 
     def test_comprobar_precipitacion(self):
         self.Archivo.abrir()
         precipitacion_posicion = self.Archivo.leer_precipitacion( 0, 0)
         self.assertIsNotNone(precipitacion_posicion['precipitacion'])
-        self.assertAlmostEqual(precipitacion_posicion['precpitacion'], 300.626235962)
+        self.assertAlmostEqual(precipitacion_posicion['precpitacion'], 300.626235962)'''
+class TestLocalidades(unittest.TestCase):
+    def setUp(self):
+        Localidad.objects.create(nombre="Segovia", latitud=10, longitud=20)
+        
+        self.localidad = Localidad()
+        
+    def test_buscarLocalidad(self):    
+        resultado = self.localidad.buscar("Segovia")
+        self.assertEquals(len(resultado),1)
+        self.assertEqual(resultado[0].nombre, "Segovia")
+    
+    def test_buscarLocalidadInexistente(self):
+        resultado = self.localidad.buscar("Whasinton")
+        self.assertEquals(len(resultado),0) 
+        
+    def test_obtenerCoordenadasRegistradas(self):
+        resultado = self.localidad.obtener_coordenadas("Segovia");
+        self.assertAlmostEqual(resultado['latitud'], 10)
+        self.assertAlmostEqual(resultado['longitud'], 20)
+    
+    def test_obtenerCoordenadasInternet(self):
+        resultado = self.localidad.obtener_coordenadas_web("Palazuelos de Eresma")
+        self.assertAlmostEqual(resultado['latitud'], 40.924187714)
+        self.assertAlmostEqual(resultado['longitud'], -4.013027219766)
+            
         
