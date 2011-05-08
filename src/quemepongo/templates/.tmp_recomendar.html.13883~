@@ -1,0 +1,12 @@
+<h1>QueMePongohoy.info</h1>
+<p>Te recomendamos que te pongas <b>{{vestido}}</b></p>
+<table width="600" border="0" cellpadding="10">
+    <tr>
+        <td>
+        </td>
+        <td>
+        </td>
+    </tr>
+</table>
+
+<img src="/images/heather.png" alt="{{vestido}}" />

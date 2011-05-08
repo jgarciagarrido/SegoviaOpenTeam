@@ -1,0 +1,8 @@
+{% extends "base.html" %} 
+{% block cuerpo %}
+<p>Introduce una temperatura (&ordm;C)</p>
+<form method="GET" action="/recomendar/temperatura">
+	<input type="text" name="temperatura">
+	<input type="submit" value="Recomendar">
+</form>
+{% endblock %}
