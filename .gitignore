@@ -1,0 +1,4 @@
+*.DS_Store
+
+src/quemepongo/settings_production.py
+src/quemepongo/settings_pruebas.py
