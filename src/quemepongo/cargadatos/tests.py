@@ -4,11 +4,11 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-
 from django.utils import unittest
+
 from ftplib import FTP
 from models import DescargadorFichero
-from quemepongo.cargadatos.models import ManejadorFichero, Localidad
+from quemepongo.cargadatos.models import ManejadorFichero, Localidad, Provincia
 import os.path
 import os
 import glob
@@ -86,9 +86,11 @@ class PruebaLecturaArchivo(unittest.TestCase):
         self.assertAlmostEqual(precipitacion_posicion['precpitacion'], 300.626235962)'''
 class TestLocalidades(unittest.TestCase):
     def setUp(self):
-        Localidad.objects.create(nombre="Segovia", latitud=10, longitud=20)
-        
+        Localidad.objects.create(nombre="Segovia", latitud=10, longitud=20)        
         self.localidad = Localidad()
+        archivo = os.path.join(os.path.dirname(__file__),"provincia.csv")
+        provincias = Provincia()
+        provincias.cargar(archivo)
         
     def test_buscarLocalidad(self):    
         resultado = self.localidad.buscar("Segovia")
@@ -108,5 +110,34 @@ class TestLocalidades(unittest.TestCase):
         resultado = self.localidad.obtener_coordenadas_web("Palazuelos de Eresma")
         self.assertAlmostEqual(resultado['latitud'], 40.924187714)
         self.assertAlmostEqual(resultado['longitud'], -4.013027219766)
-            
+    def test_crear(self):
+        valores={'nombre': 'ALHUCEMAS',
+                 'provincia_id': 53
+                }
+        resultado = self.localidad.crear(valores)
+        self.assertIsInstance(resultado,Localidad)
+
+    def test_carga(self):
+        archivo = os.path.join(os.path.dirname(__file__),"poblacion.csv")
+        resultado = self.localidad.cargar(archivo)
+        self.assertEqual(resultado, 71035)
+         
         
+            
+class TestProvincias(unittest.TestCase):
+    def test_crear(self):
+        valores ={'nombre': 'Alicante',
+                  'cod_migracion': 4
+                  } 
+        provincias = Provincia()
+        resultado = provincias.crear(valores)
+        self.assertIsInstance(resultado,Provincia)
+    def test_carga(self):
+        archivo = os.path.join(os.path.dirname(__file__),"provincia.csv")
+        provincias = Provincia()
+        resultado = provincias.cargar(archivo)
+        self.assertEqual(resultado, 53)
+    
+        
+    
+            

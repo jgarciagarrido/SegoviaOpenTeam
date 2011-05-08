@@ -6,7 +6,7 @@ import urllib
 import urllib2
 import json
 import unicodedata
-
+import csv
 
 # Create your models here.
 class DescargadorFichero:    
@@ -50,6 +50,8 @@ class Localidad(models.Model):
     nombre = models.CharField(max_length=100)
     latitud = models.FloatField(null=True)
     longitud = models.FloatField(null=True)
+    provincia = models.ForeignKey('Provincia',null=True)
+    
     def buscar(self, nombre):
         return Localidad.objects.filter(nombre=nombre)
     def obtener_coordenadas(self,nombre):
@@ -69,7 +71,34 @@ class Localidad(models.Model):
         return {'latitud': latitud,
                 'longitud': longitud}
         #http://open.mapquestapi.com/nominatim/v1/search?q=Palazuelos+de+Eresma&format=json&limit=1
+    def crear(self,valores):
+        provincia = Provincia.objects.filter(cod_migracion=valores['provincia_id'])
+        return Localidad.objects.create(nombre=valores['nombre'], provincia=provincia[0])
+    def cargar(self,archivo):
+        fp = csv.DictReader(open(archivo), delimiter=";")
+        n=0
+        for linea in fp:
+            valores={'nombre': linea['nombre'],
+                     'provincia_id': linea['provincia_id']}
+            self.crear(valores)
+            n +=1
+        return n
 
+class Provincia(models.Model):
+    nombre = models.CharField(max_length=20)
+    cod_migracion = models.IntegerField()
+    def crear(self,valores):
+        return Provincia.objects.create(nombre=valores['nombre'], cod_migracion=valores['cod_migracion'])
+    def cargar(self,archivo):
+        fp = csv.DictReader(open(archivo), delimiter=";")
+        n=0
+        for linea in fp:
+            valores={'nombre': linea['nombre'],
+                     'cod_migracion': linea['id']}
+            self.crear(valores)
+            n +=1
+        return n
+    
 if __name__ == '__main__':
     localidad = Localidad()
     hola = localidad.obtener_coordenadas_web('Palazuelos de Eresma')
